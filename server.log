@@ -1,0 +1,34 @@
+2026-05-18 14:34:26,081 [INFO] [+] Server listening on 0.0.0.0:8443...
+2026-05-18 14:45:33,874 [INFO] [+] Connection from 192.168.56.1:51954
+2026-05-18 14:45:33,876 [INFO] [*] Connection request from: Debian_Node_01
+2026-05-18 14:45:33,908 [ERROR] [-] Handshake exception: Incorrect AES key length (33 bytes)
+2026-05-18 14:49:03,143 [INFO] [+] Connection from 192.168.56.1:52162
+2026-05-18 14:54:19,680 [INFO] [+] Server listening on 0.0.0.0:8443...
+2026-05-18 14:54:30,040 [INFO] [+] Connection from 192.168.56.1:52511
+2026-05-18 14:54:30,041 [INFO] [*] Connection request from: Debian_Node_01
+2026-05-18 14:54:30,043 [ERROR] [-] Handshake exception: Incorrect AES key length (33 bytes)
+2026-05-18 14:59:13,071 [INFO] [+] Server listening on 0.0.0.0:8443...
+2026-05-18 14:59:43,736 [INFO] [+] Connection from 192.168.56.1:52765
+2026-05-18 14:59:43,737 [INFO] [*] Connection request from: Debian_Node_01
+2026-05-18 14:59:43,741 [INFO] [+] Handshake success! Device verified.
+2026-05-18 14:59:43,741 [INFO] [+] LUKS key sent to client.
+2026-05-18 15:12:04,887 [INFO] [+] Server online on 0.0.0.0:8443...
+2026-05-18 15:12:08,338 [INFO] [*] Handshake request from: Debian_Node_01
+2026-05-18 15:12:08,342 [INFO] [+] Handshake OK. Device verified.
+2026-05-18 15:12:08,342 [INFO] [+] LUKS key dispatched.
+2026-05-18 15:25:08,610 [INFO] [+] Server online on 0.0.0.0:8443...
+2026-05-18 15:25:19,855 [INFO] [*] Handshake request from: Debian_Node_01
+2026-05-18 15:25:19,858 [INFO] [+] Handshake OK. Device verified.
+2026-05-18 15:25:19,858 [INFO] [+] LUKS key dispatched.
+2026-05-18 15:30:45,687 [INFO] [+] Server online on 0.0.0.0:8443...
+2026-05-18 15:30:52,499 [INFO] [*] Connection request from: Debian_Node_01
+2026-05-18 15:30:52,527 [INFO] [+] Handshake verification successful.
+2026-05-18 15:54:04,486 [INFO] [+] Server online on 0.0.0.0:8443...
+2026-05-18 15:54:10,832 [INFO] [*] Connection request from: Debian_Physical_Node
+2026-05-18 15:54:10,857 [INFO] [+] Handshake verification successful.
+2026-05-18 15:56:14,257 [INFO] [*] Connection request from: Debian_Physical_Node
+2026-05-18 15:56:14,302 [INFO] [+] Handshake verification successful.
+2026-05-18 15:57:40,356 [INFO] [*] Connection request from: Debian_Physical_Node
+2026-05-18 15:57:40,410 [INFO] [+] Handshake verification successful.
+2026-05-18 15:57:54,528 [INFO] [*] Connection request from: Debian_Physical_Node
+2026-05-18 15:57:54,574 [INFO] [+] Handshake verification successful.
