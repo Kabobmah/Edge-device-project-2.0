@@ -6,7 +6,6 @@ import time
 import subprocess
 from datetime import datetime
 
-# Cryptodome for linux , Crypto for windows
 from Cryptodome.Cipher import AES
 from Cryptodome.Util.Padding import pad, unpad
 from Cryptodome.Random import get_random_bytes
@@ -26,7 +25,7 @@ class SecureKeyClient:
 
     def check_root(self):
         if os.geteuid() != 0:
-            print("[-] Ошибка: Запускай строго через sudo!")
+            print("[-] sudo only")
             sys.exit(1)
 
     def encrypt_data(self, plain_text: bytes) -> dict:
@@ -46,31 +45,33 @@ class SecureKeyClient:
         try:
             os.makedirs(self.mount_point, exist_ok=True)
             
-         
+            # opening LUKS
             open_cmd = f"echo -n '{luks_key}' | cryptsetup open {self.device} {self.mapper} --key-file -"
             subprocess.run(open_cmd, shell=True, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
             
+            # mounting
             mount_cmd = f"mount -o x-gvfs-show /dev/mapper/{self.mapper} {self.mount_point}"
             subprocess.run(mount_cmd, shell=True, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
             
-            # Настройка прав
+            # giving rights
             subprocess.run(f"chmod 777 {self.mount_point}", shell=True)
             subprocess.run(f"chown -R edgedevice:edgedevice {self.mount_point}", shell=True)
             
-            # Обновляем таблицы разделов для GUI
+            
             subprocess.run("udevadm trigger", shell=True, stderr=subprocess.DEVNULL)
             
-            print(f"[+] Success! Encrypted disk mounted at: {self.mount_point}")
+            print(f"[+]Encrypted disk mounted at: {self.mount_point}")
             self.is_mounted = True
         except subprocess.CalledProcessError as e:
             print(f"[-] Mount execution failed: {e}")
             self.emergency_lock(exit_program=True)
 
     def emergency_lock(self, exit_program=True):
+        print(f"\n[*] KERNEL LEVEL BLOCKING OF THE DISK {self.device_name}...")
         
-        print(f"\n[*] Start of kernel level blocking {self.device_name}...")
-        
+        # clearing cache
         subprocess.run("sync", shell=True)
+
 
         subprocess.run("pkill -9 -x thunar", shell=True, stderr=subprocess.DEVNULL)
         subprocess.run("pkill -9 -f gvfs", shell=True, stderr=subprocess.DEVNULL)
@@ -81,7 +82,7 @@ class SecureKeyClient:
             for mount in mounts:
                 if mount.strip():
                     target = mount.split()[2]
-                    print(f"[*] Dropping processes from: {target}")
+                    print(f"[*] killing folder: {target}")
                     subprocess.run(f"fuser -k -9 '{target}'", shell=True, stderr=subprocess.DEVNULL)
                     subprocess.run(f"umount -f -l '{target}'", shell=True, stderr=subprocess.DEVNULL)
         except subprocess.CalledProcessError:
@@ -93,23 +94,22 @@ class SecureKeyClient:
                 if dm.strip():
                     dm_name = dm.split()[0]
                     
+                    
                     status = subprocess.check_output(f"dmsetup status {dm_name}", shell=True).decode()
                     if self.device_name in status or "luks" in dm_name or "secret" in dm_name:
-                        print(f"[+] Kernel mapper: {dm_name}. Сносим устройство...")
+                        print(f"[+] kernel mapper: {dm_name}. removing...")
                         
                         subprocess.run(f"fuser -k -9 /dev/mapper/{dm_name}", shell=True, stderr=subprocess.DEVNULL)
                         subprocess.run(f"umount -f -l /dev/mapper/{dm_name}", shell=True, stderr=subprocess.DEVNULL)
-                        
                         subprocess.run(f"dmsetup remove -f {dm_name}", shell=True, stderr=subprocess.DEVNULL)
-                        
                         subprocess.run(f"cryptsetup close {dm_name}", shell=True, stderr=subprocess.DEVNULL)
         except Exception as e:
-            print(f"[-] Error: {e}")
+            print(f"[-] Error clearing mappers: {e}")
 
         subprocess.run("udevadm trigger", shell=True, stderr=subprocess.DEVNULL)
         subprocess.run(f"blockdev --flushbufs {self.device}", shell=True, stderr=subprocess.DEVNULL)
 
-        print("[+] DONE")
+        print("[+] done, kernel level block and RAM cleared")
         self.is_mounted = False
         
         if exit_program:
@@ -117,6 +117,7 @@ class SecureKeyClient:
             sys.exit(0)
 
     def send_ping(self) -> bool:
+        
         try:
             s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             s.settimeout(2)
@@ -198,10 +199,7 @@ class SecureKeyClient:
 if __name__ == "__main__":
     client = SecureKeyClient()
     client.check_root()
-    
     client.emergency_lock(exit_program=False)
-    
     client.execute_handshake()
-    
     if client.is_mounted:
         client.start_keep_alive_loop()
